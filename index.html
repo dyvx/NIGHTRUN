@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#07030d" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="description" content="NIGHTRUN — NEON DISTRICT. A neon-lit 3D endless runner. Play offline, anywhere." />
+
+    <!-- iOS standalone / Add to Home Screen -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="NIGHTRUN" />
+    <meta name="application-name" content="NIGHTRUN" />
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+    <link rel="icon" type="image/svg+xml" href="./icons/favicon.svg" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+
+    <title>NIGHTRUN — NEON DISTRICT</title>
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="stage" aria-label="Nightrun game view"></canvas>
+      <div class="fx-scanlines" aria-hidden="true"></div>
+      <div class="fx-vignette" aria-hidden="true"></div>
+      <div class="fx-flash" id="flash" aria-hidden="true"></div>
+
+      <main id="ui" class="ui">
+        <!-- ================= HUD ================= -->
+        <section id="hud" class="hud is-hidden" aria-live="polite">
+          <div class="hud__top">
+            <div class="hud__score">
+              <span class="hud__k">SCORE</span>
+              <span class="hud__v" id="hud-score">0</span>
+              <span class="hud__best">BEST <b id="hud-best">0</b></span>
+            </div>
+            <button id="btn-pause" class="btn-icon" aria-label="Pause game" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="6" y="4" width="4" height="16" rx="1.4" />
+                <rect x="14" y="4" width="4" height="16" rx="1.4" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="hud__stats">
+            <div class="chip">
+              <span class="chip__k">DIST</span><span class="chip__v" id="hud-dist">0<i>m</i></span>
+            </div>
+            <div class="chip chip--shard">
+              <svg viewBox="0 0 24 24" aria-hidden="true" class="chip__ico">
+                <path d="M12 2 20 9l-8 13L4 9z" />
+              </svg>
+              <span class="chip__v" id="hud-shards">0</span>
+            </div>
+            <div class="chip chip--speed">
+              <span class="chip__k">SPD</span><span class="chip__v" id="hud-speed">1.0<i>x</i></span>
+            </div>
+          </div>
+
+          <div id="touch-pad" class="touch-pad" aria-hidden="true">
+            <button class="touch-btn touch-btn--left" data-action="left" type="button" aria-label="Move left">
+              <svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" /></svg>
+            </button>
+            <div class="touch-pad__mid">
+              <button class="touch-btn touch-btn--jump" data-action="jump" type="button" aria-label="Jump">
+                <svg viewBox="0 0 24 24"><path d="M5 15l7-7 7 7" /></svg>
+              </button>
+              <button class="touch-btn touch-btn--slide" data-action="slide" type="button" aria-label="Slide">
+                <svg viewBox="0 0 24 24"><path d="M5 9l7 7 7-7" /></svg>
+              </button>
+            </div>
+            <button class="touch-btn touch-btn--right" data-action="right" type="button" aria-label="Move right">
+              <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" /></svg>
+            </button>
+          </div>
+        </section>
+
+        <!-- ================= BOOT ================= -->
+        <section id="screen-boot" class="screen screen--boot is-active">
+          <div class="boot__mark">NIGHTRUN</div>
+          <div class="boot__bar"><span id="boot-fill"></span></div>
+          <div class="boot__label" id="boot-label">CALIBRATING NEON GRID</div>
+        </section>
+
+        <!-- ================= MAIN MENU ================= -->
+        <section id="screen-menu" class="screen screen--menu">
+          <div class="menu">
+            <header class="brand">
+              <div class="brand__ko">ナイトラン</div>
+              <h1 class="brand__title" data-text="NIGHTRUN">NIGHTRUN</h1>
+              <div class="brand__sub">— NEON DISTRICT —</div>
+            </header>
+
+            <button id="btn-play" class="btn btn--primary btn--wide" type="button">
+              <span class="btn__glow"></span>
+              <span class="btn__label">RUN</span>
+              <span class="btn__sub">SWIPE / ARROWS</span>
+            </button>
+
+            <div class="menu__row">
+              <button id="btn-settings" class="btn btn--ghost" type="button">SETTINGS</button>
+              <button id="btn-howto" class="btn btn--ghost" type="button">HOW TO PLAY</button>
+            </div>
+
+            <div class="menu__best">
+              <span class="menu__best-k">PERSONAL BEST</span>
+              <span class="menu__best-v" id="menu-best">0</span>
+              <span class="menu__best-meta" id="menu-best-meta">NO RUNS YET</span>
+            </div>
+          </div>
+          <footer class="menu__foot">
+            <span id="net-state" class="dot dot--on"><i></i>OFFLINE READY</span>
+            <span class="menu__ver">v1.0.0</span>
+          </footer>
+        </section>
+
+        <!-- ================= PAUSE ================= -->
+        <section id="screen-pause" class="screen screen--compact">
+          <div class="panel">
+            <div class="panel__eyebrow">SYSTEM HOLD</div>
+            <h2 class="panel__title">PAUSED</h2>
+            <div class="panel__grid">
+              <div><span>SCORE</span><b id="pause-score">0</b></div>
+              <div><span>DIST</span><b id="pause-dist">0m</b></div>
+              <div><span>SHARDS</span><b id="pause-shards">0</b></div>
+            </div>
+            <button id="btn-resume" class="btn btn--primary btn--wide" type="button">RESUME</button>
+            <div class="menu__row">
+              <button id="btn-pause-settings" class="btn btn--ghost" type="button">SETTINGS</button>
+              <button id="btn-quit" class="btn btn--ghost btn--danger" type="button">END RUN</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= GAME OVER ================= -->
+        <section id="screen-over" class="screen screen--compact">
+          <div class="panel panel--over">
+            <div class="panel__eyebrow" id="over-eyebrow">SIGNAL LOST</div>
+            <h2 class="panel__title">RUN OVER</h2>
+            <div class="over__score">
+              <span class="over__score-k">SCORE</span>
+              <b class="over__score-v" id="over-score">0</b>
+            </div>
+            <div class="panel__grid">
+              <div><span>BEST</span><b id="over-best">0</b></div>
+              <div><span>DIST</span><b id="over-dist">0m</b></div>
+              <div><span>SHARDS</span><b id="over-shards">0</b></div>
+            </div>
+            <div id="over-badge" class="over__badge is-hidden">NEW PERSONAL BEST</div>
+            <button id="btn-restart" class="btn btn--primary btn--wide" type="button">RUN AGAIN</button>
+            <button id="btn-menu" class="btn btn--ghost btn--wide" type="button">MAIN MENU</button>
+          </div>
+        </section>
+
+        <!-- ================= SETTINGS ================= -->
+        <section id="screen-settings" class="screen screen--compact">
+          <div class="panel">
+            <div class="panel__eyebrow">CONFIG</div>
+            <h2 class="panel__title">SETTINGS</h2>
+
+            <div class="setting">
+              <div class="setting__txt"><b>AUDIO</b><span>Music &amp; sound effects</span></div>
+              <button class="switch" id="opt-audio" role="switch" aria-checked="true" type="button"><i></i></button>
+            </div>
+            <div class="setting">
+              <div class="setting__txt"><b>MUSIC</b><span>Synthwave soundtrack</span></div>
+              <button class="switch" id="opt-music" role="switch" aria-checked="true" type="button"><i></i></button>
+            </div>
+            <div class="setting">
+              <div class="setting__txt"><b>HAPTICS</b><span>Vibration feedback (mobile)</span></div>
+              <button class="switch" id="opt-haptics" role="switch" aria-checked="true" type="button"><i></i></button>
+            </div>
+            <div class="setting">
+              <div class="setting__txt"><b>ON-SCREEN BUTTONS</b><span>Arrow pad during play</span></div>
+              <button class="switch" id="opt-touchpad" role="switch" aria-checked="false" type="button"><i></i></button>
+            </div>
+            <div class="setting setting--seg">
+              <div class="setting__txt"><b>GRAPHICS</b><span>Quality preset</span></div>
+              <div class="seg" id="opt-quality">
+                <button data-q="low" type="button">LOW</button>
+                <button data-q="medium" type="button">MED</button>
+                <button data-q="high" type="button">HIGH</button>
+              </div>
+            </div>
+
+            <div class="panel__note" id="settings-note">
+              Runs 100% offline once installed. Progress saves on this device.
+            </div>
+            <button id="btn-settings-close" class="btn btn--primary btn--wide" type="button">DONE</button>
+            <button id="btn-reset-data" class="btn btn--text btn--danger" type="button">RESET ALL PROGRESS</button>
+          </div>
+        </section>
+
+        <!-- ================= HOW TO PLAY ================= -->
+        <section id="screen-howto" class="screen screen--compact">
+          <div class="panel">
+            <div class="panel__eyebrow">BRIEFING</div>
+            <h2 class="panel__title">HOW TO RUN</h2>
+            <ul class="howto">
+              <li><b>SWIPE ◀ ▶</b><span>Change lane</span></li>
+              <li><b>SWIPE ▲ / SPACE</b><span>Jump over low barriers</span></li>
+              <li><b>SWIPE ▼ / SHIFT</b><span>Slide under laser gates</span></li>
+              <li><b>SHARDS</b><span>Each shard adds score</span></li>
+              <li><b>SPEED</b><span>Rises forever — stay sharp</span></li>
+            </ul>
+            <div class="panel__note">Keyboard: ← → or A/D · ↑/W/Space jump · ↓/S/Shift slide · P/Esc pause</div>
+            <button id="btn-howto-close" class="btn btn--primary btn--wide" type="button">GOT IT</button>
+          </div>
+        </section>
+
+        <!-- ================= LANDSCAPE HINT ================= -->
+        <div id="rotate-hint" class="rotate-hint is-hidden">
+          <svg viewBox="0 0 24 24"><path d="M7 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/></svg>
+          <span>ROTATE FOR WIDESCREEN</span>
+        </div>
+      </main>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
