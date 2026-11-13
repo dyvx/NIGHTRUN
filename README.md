@@ -4,7 +4,9 @@ A complete, offline-first 3D endless runner for the browser. Third-person chase 
 three lanes, procedural neon city, original anime-inspired character, and a hand-synthesised
 synthwave soundtrack — built with **Three.js + Vite**, no CDNs, no servers, no accounts.
 
-**Play:** open the game, hit `RUN`, swipe. It works on a plane, in a tunnel, with the radio off.
+**Play now:** **https://nightrun-five.vercel.app** · repo: `github.com/dyvx/NIGHTRUN`
+
+Hit `RUN` and swipe. It works on a plane, in a tunnel, with the radio off.
 
 <p align="center">
   <img src="docs/screenshot-menu.png" width="240" alt="Nightrun main menu" />
@@ -188,7 +190,10 @@ node tools/test-game.mjs        # 48 assertions — gameplay
 node tools/test-offline.mjs     # 32 assertions — offline / PWA
 node tools/test-fairness.mjs    # 12 assertions — procedural fairness
 npm test                        # build + the first two suites
+npm run test:live               # 12 assertions against the deployed URL
 ```
+
+Latest run: **48/48 gameplay**, **32/32 offline**, **12/12 fairness**, **12/12 live**.
 
 All three suites drive the **built** app in headless Chromium with real WebGL. What they cover:
 

@@ -2,7 +2,7 @@
   "name": "nightrun-neon-district",
   "private": true,
   "version": "1.0.0",
-  "description": "NIGHTRUN — NEON DISTRICT: a 3D endless runner PWA built with Three.js + Vite. Fully playable offline.",
+  "description": "NIGHTRUN \u2014 NEON DISTRICT: a 3D endless runner PWA built with Three.js + Vite. Fully playable offline.",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 5173",
@@ -10,7 +10,8 @@
     "preview": "vite preview --host 0.0.0.0 --port 4173",
     "test:game": "node tools/test-game.mjs",
     "test:offline": "node tools/test-offline.mjs",
-    "test": "npm run build && npm run test:game && npm run test:offline"
+    "test": "npm run build && npm run test:game && npm run test:offline",
+    "test:live": "node tools/test-live.mjs https://nightrun-five.vercel.app"
   },
   "dependencies": {
     "three": "0.170.0"
